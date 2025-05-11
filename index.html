@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="hi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>आपके नाम से जानिए आप कौन से जानवर हैं!</title>
+    <meta name="description" content="अपना नाम डालें और जानें कि आप किस जानवर से मिलते-जुलते हैं!">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Nirmala UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e1b1b, #322118);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            animation: fadeIn 0.8s ease;
+            position: relative;
+            z-index: 10;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #ffff00;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .input-container {
+            margin: 20px 0;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #25D366, #128C7E);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .result {
+            display: none;
+            animation: slideUp 0.5s ease;
+        }
+
+        .result-img {
+            width: 200px;
+            height: 200px;
+            border-radius: 10px;
+            object-fit: cover;
+            margin: 15px auto;
+            border: 3px solid #fff;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .result-img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .result-title {
+            font-size: 1.5rem;
+            margin: 10px 0;
+            color: #ffff00;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        .result-desc {
+            margin-bottom: 20px;
+            line-height: 1.5;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        /* Cracker effects */
+        .cracker {
+            position: fixed;
+            width: 100px;
+            height: 150px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 5;
+            pointer-events: none;
+            animation: cracker-pop 0.5s ease-out forwards;
+        }
+
+        .cracker-left {
+            left: 10px;
+            bottom: 50px;
+            background-image: url('https://cdn.pixabay.com/photo/2016/11/22/23/44/firecracker-1851266_640.png');
+        }
+
+        .cracker-right {
+            right: 10px;
+            bottom: 50px;
+            background-image: url('https://cdn.pixabay.com/photo/2016/11/22/23/44/firecracker-1851265_640.png');
+            transform: scaleX(-1);
+        }
+
+        @keyframes cracker-pop {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* Fireworks */
+        .firework {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: firework-animation 2s ease-out forwards;
+        }
+
+        @keyframes firework-animation {
+            0% {
+                transform: translate(0, 0);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(var(--tx), var(--ty));
+                opacity: 0;
+            }
+        }
+
+        /* Diya (lamp) effect */
+        .diya {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, #ff9d00, #ff5e00);
+            border-radius: 50%;
+            filter: blur(5px);
+            animation: diya-flicker 3s infinite alternate;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        @keyframes diya-flicker {
+
+            0%,
+            100% {
+                opacity: 0.8;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .ad-container {
+            width: 100%;
+            max-width: 600px;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+
+        .burst {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 20px 10px rgba(255, 200, 0, 0.7);
+            opacity: 0;
+            z-index: 50;
+        }
+
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 50;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="fireworks-container"></div>
+    <div id="diyas-container"></div>
+    <div id="crackers-container"></div>
+    <div class="flash"></div>
+
+    <div class="container">
+        <h1>आपके नाम से जानिए<br>आप कौन से जानवर हैं! 🐾</h1>
+
+        <div id="input-screen">
+            <p>अपना नाम लिखें और जानें कि आपकी पर्सनैलिटी किस जानवर से मेल खाती है!</p>
+
+            <div class="input-container">
+                <input type="text" id="name-input" placeholder="यहाँ अपना नाम लिखें...">
+                <button class="btn" id="check-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                        <path
+                            d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z" />
+                    </svg>
+                    जानवर चेक करें
+                </button>
+            </div>
+        </div>
+
+        <div id="result" class="result">
+            <img class="result-img" id="result-img" src="" alt="जानवर का चित्र">
+            <h2 class="result-title" id="result-title"></h2>
+            <p class="result-desc" id="result-desc"></p>
+
+            <button class="btn" id="share-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                    <path
+                        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                </svg>
+                व्हाट्सएप पर शेयर करें
+            </button>
+            <button class="btn" id="restart-btn" style="background: linear-gradient(45deg, #FF5722, #E91E63);">
+                फिर से चेक करें
+            </button>
+        </div>
+    </div>
+
+    <div class="ad-container">
+        <p>Advertisement Space</p>
+        <!-- Ad code would go here -->
+        <div
+            style="height:90px; background:rgba(255,255,255,0.1); display:flex; justify-content:center; align-items:center; border-radius:8px;">
+            <script type="text/javascript">
+                atOptions = {
+                    'key': 'd34f87ddc2f7ab0c7c8d2a4b385a504e',
+                    'format': 'iframe',
+                    'height': 50,
+                    'width': 320,
+                    'params': {}
+                };
+            </script>
+            <script type="text/javascript"
+                src="//www.highperformanceformat.com/d34f87ddc2f7ab0c7c8d2a4b385a504e/invoke.js"></script>
+        </div>
+        <div
+        style="height:90px; background:rgba(255,255,255,0.1); display:flex; justify-content:center; align-items:center; border-radius:8px;">
+        <script type="text/javascript">
+            atOptions = {
+                'key': 'd34f87ddc2f7ab0c7c8d2a4b385a504e',
+                'format': 'iframe',
+                'height': 50,
+                'width': 320,
+                'params': {}
+            };
+        </script>
+        <script type="text/javascript"
+            src="//www.highperformanceformat.com/d34f87ddc2f7ab0c7c8d2a4b385a504e/invoke.js"></script>
+    </div>
+    </div>
+
+    <script>
+        // Animals data - now with random images
+        const animals = {
+            'A': {
+                name: "अजगर 🐍",
+                imgs: [
+                    "https://cdn.pixabay.com/photo/2017/05/31/21/38/python-2361730_640.jpg",
+                    "https://cdn.pixabay.com/photo/2018/08/20/09/30/snake-3618913_640.jpg",
+                    "https://cdn.pixabay.com/photo/2017/06/20/22/14/anaconda-2426428_640.jpg"
+                ],
+                description: "आप अजगर की तरह समझदार और रहस्यमय हैं! आप शांत रहना पसंद करते हैं लेकिन जब जरूरत हो तो तेजी से हमला कर सकते हैं।"
+            },
+            'B': {
+                name: "आइबेक्स 🐏",
+                imgs: [
+                    "https://cdn.pixabay.com/photo/2018/05/12/17/35/mountain-goat-3393813_640.jpg",
+                    "https://cdn.pixabay.com/photo/2016/11/14/05/21/mountain-goat-1822597_640.jpg",
+                    "https://cdn.pixabay.com/photo/2018/07/16/16/08/goat-3542098_640.jpg"
+                ],
+                description: "आप आइबेक्स (पहाड़ी बकरी) की तरह मजबूत और स्थिर हैं! ऊँचे लक्ष्यों तक पहुँचना आपकी खासियत है।"
+            },
+            'C': {
+                name: "इमू 🦩",
+                imgs: [
+                    "https://cdn.pixabay.com/photo/2017/02/28/23/00/emu-2106432_640.jpg",
+                    "https://cdn.pixabay.com/photo/2017/03/13/10/25/emu-2139104_640.jpg",
+                    "https://cdn.pixabay.com/photo/2016/11/21/12/59/animal-1845267_640.jpg"
+                ],
+                description: "आप इमू (ऑस्ट्रेलियाई पक्षी) की तरह अनोखे और ऊर्जावान हैं! आपको नई जगहें एक्सप्लोर करना पसंद है।"
+            },
+            'D': {
+                name: "उल्लू 🦉",
+                imgs: [
+                    "https://cdn.pixabay.com/photo/2017/02/07/16/47/owl-2046479_640.jpg",
+                    "https://cdn.pixabay.com/photo/2016/11/23/18/27/owl-1853925_640.jpg",
+                    "https://cdn.pixabay.com/photo/2017/01/31/16/27/owl-2025543_640.png"
+                ],
+                description: "आप उल्लू की तरह बुद्धिमान और विवेकशील हैं! रात में जागना और गहरी सोच रखना आपकी खासियत है।"
+            },
+            'E': {
+                name: "कंगारू 🦘",
+                imgs: [
+                    "https://cdn.pixabay.com/photo/2018/04/13/21/24/kangaroo-3317041_640.jpg",
+                    "https://cdn.pixabay.com/photo/2016/11/21/15/14/kangaroo-1846005_640.jpg",
+                    "https://cdn.pixabay.com/photo/2018/01/17/07/06/kangaroo-3087670_640.jpg"
+                ],
+                description: "आप कंगारू की तरह एनर्जेटिक और फुर्तीले हैं! आगे बढ़ते रहना आपकी आदत है।"
+            },
+            'F': {
+                name: "खरगोश 🐇",
+                imgs: [
+                    "https://cdn.pixabay.com/photo/2017/04/02/22/36/easter-2197043_640.jpg",
+                    "https://cdn.pixabay.com/photo/2017/01/30/23/28/rabbit-2023026_640.jpg",
+                    "https://cdn.pixabay.com/photo/2016/11/29/03/42/rabbit-1867476_640.jpg"
+                ],
+                description: "आप खरगोश की तरह मिलनसार और चंचल हैं! तेजी से सीखना और दोस्त बनाना आपकी खासियत है।"
+            },
+            'G': {
+                name: "गैंडा 🦏",
+                imgs: [
+                    "https://cdn.pixabay.com/photo/2017/10/11/14/41/rhino-2841727_640.jpg",
+                    "https://cdn.pixabay.com/photo/2018/05/26/18/06/rhinoceros-3432267_640.jpg",
+                    "https://cdn.pixabay.com/photo/2020/03/09/16/13/rhino-4916349_640.jpg"
+                ],
+                description: "आप गैंडे की तरह मजबूत इरादों वाले हैं! कोई भी आपको आसानी से हिला नहीं सकता।"
+            },
+            'H': {
+                name: "घड़ियाल 🐊",
+                imgs: [
+                    "https://cdn.pixabay.com/photo/2017/06/05/11/21/alligator-2373328_640.jpg",
+                    "https://cdn.pixabay.com/photo/2015/11/16/16/28/crocodile-1045854_640.jpg",
+                    "https://cdn.pixabay.com/photo/2016/03/27/22/22/alligator-1284365_640.jpg"
+                ],
+                description: "आप घड़ियाल की तरह धैर्यवान और रणनीतिक हैं! सही समय का इंतजार करना आप जानते हैं।"
+            },
+            'default': {
+                name: "पक्षी 🦜",
+                imgs: [
+                    "https://cdn.pixabay.com/photo/2017/02/07/16/47/kingfisher-2046453_640.jpg",
+                    "https://cdn.pixabay.com/photo/2017/02/07/16/47/bird-2046463_640.jpg",
+                    "https://cdn.pixabay.com/photo/2017/01/31/16/27/bird-2025544_640.png"
+                ],
+                description: "आप पक्षी की तरह आजाद ख्याल और रोमांच पसंद हैं! नई ऊँचाइयों को छूना आपकी आदत है।"
+            }
+        };
+
+        // English letters mapping to Hindi categories
+        const englishToHindiMap = {
+            'A': 'A', 'B': 'B', 'C': 'C', 'D': 'D', 'E': 'E',
+            'F': 'F', 'G': 'G', 'H': 'H', 'I': 'C', 'J': 'D',
+            'K': 'C', 'L': 'A', 'M': 'B', 'N': 'C', 'O': 'D',
+            'P': 'E', 'Q': 'F', 'R': 'G', 'S': 'H', 'T': 'A',
+            'U': 'B', 'V': 'C', 'W': 'D', 'X': 'E', 'Y': 'F', 'Z': 'G'
+        };
+
+        // DOM Elements
+        const inputScreen = document.getElementById('input-screen');
+        const resultContainer = document.getElementById('result');
+        const nameInput = document.getElementById('name-input');
+        const checkBtn = document.getElementById('check-btn');
+        const resultImg = document.getElementById('result-img');
+        const resultTitle = document.getElementById('result-title');
+        const resultDesc = document.getElementById('result-desc');
+        const shareBtn = document.getElementById('share-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const flash = document.querySelector('.flash');
+
+        // Cracker burst colors
+        const burstColors = ['#ff0000', '#ff9900', '#ffff00', '#ff6600', '#ff3300'];
+
+        // Check Animal
+        checkBtn.addEventListener('click', () => {
+            const name = nameInput.value.trim();
+
+            if (name === "") {
+                alert("कृपया अपना नाम लिखें!");
+                return;
+            }
+
+            inputScreen.style.display = 'none';
+            resultContainer.style.display = 'block';
+
+            // Get first character (Hindi or English)
+            const firstChar = name[0].toUpperCase();
+            let animalKey = 'default';
+
+            // Check if first character exists in our data
+            if (animals[firstChar]) {
+                animalKey = firstChar;
+            }
+            // Check if English character and map to Hindi
+            else if (englishToHindiMap[firstChar] && animals[englishToHindiMap[firstChar]]) {
+                animalKey = englishToHindiMap[firstChar];
+            }
+
+            const animal = animals[animalKey] || animals['default'];
+
+            // Select random image from available options
+            const randomImgIndex = Math.floor(Math.random() * animal.imgs.length);
+            const selectedImg = animal.imgs[randomImgIndex];
+
+            // Display result
+            resultImg.src = selectedImg;
+            resultTitle.textContent = `${name}, आप हैं: ${animal.name}`;
+            resultDesc.textContent = animal.description;
+
+            // Create celebration effects
+            createCrackers();
+            createFireworks();
+            createDiyas();
+            startBurstEffect(); // Start the cracker burst effect
+
+            // Set up WhatsApp sharing
+            const shareText = `मेरा नाम ${name} है और मैं हूँ ${animal.name}! "${animal.description}"\n\nआप कौन से जानवर हैं? यहाँ चेक करें: ${window.location.href}`;
+            shareBtn.onclick = () => {
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'आप कौन से जानवर हैं?',
+                        text: shareText,
+                        url: window.location.href
+                    }).catch(err => {
+                        window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
+                    });
+                } else {
+                    window.open(`https://wa.me/?text=${encodeURIComponent(shareText)}`, '_blank');
+                }
+            };
+        });
+
+        // Restart
+        restartBtn.addEventListener('click', () => {
+            resultContainer.style.display = 'none';
+            inputScreen.style.display = 'block';
+            nameInput.value = '';
+
+            // Clear effects
+            document.getElementById('fireworks-container').innerHTML = '';
+            document.getElementById('diyas-container').innerHTML = '';
+            document.getElementById('crackers-container').innerHTML = '';
+        });
+
+        // Image error handling
+        function handleImageError(imgElement) {
+            imgElement.src = "https://cdn.pixabay.com/photo/2016/04/01/09/29/animal-1300244_640.png";
+            imgElement.alt = "डिफ़ॉल्ट जानवर छवि";
+        }
+
+        // Cracker effect
+        function createCrackers() {
+            const container = document.getElementById('crackers-container');
+            container.innerHTML = '';
+
+            // Left cracker
+            const leftCracker = document.createElement('div');
+            leftCracker.className = 'cracker cracker-left';
+            container.appendChild(leftCracker);
+
+            // Right cracker
+            const rightCracker = document.createElement('div');
+            rightCracker.className = 'cracker cracker-right';
+            container.appendChild(rightCracker);
+
+            // Remove after animation
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 1000);
+        }
+
+        // Fireworks effect
+        function createFireworks() {
+            const container = document.getElementById('fireworks-container');
+            container.innerHTML = '';
+
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const firework = document.createElement('div');
+                    firework.className = 'firework';
+
+                    // Random position around the container
+                    const x = Math.random() * window.innerWidth;
+                    const y = Math.random() * window.innerHeight;
+
+                    // Random target direction
+                    const tx = (Math.random() - 0.5) * 200;
+                    const ty = (Math.random() - 0.5) * 200;
+
+                    // Random color
+                    const colors = ['#ff0000', '#ffff00', '#00ff00', '#00ffff', '#ff00ff'];
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+
+                    firework.style.left = `${x}px`;
+                    firework.style.top = `${y}px`;
+                    firework.style.backgroundColor = color;
+                    firework.style.setProperty('--tx', `${tx}px`);
+                    firework.style.setProperty('--ty', `${ty}px`);
+
+                    container.appendChild(firework);
+
+                    // Remove after animation
+                    setTimeout(() => firework.remove(), 2000);
+                }, i * 100);
+            }
+        }
+
+        // Diya (lamp) effect
+        function createDiyas() {
+            const container = document.getElementById('diyas-container');
+            container.innerHTML = '';
+
+            for (let i = 0; i < 10; i++) {
+                const diya = document.createElement('div');
+                diya.className = 'diya';
+
+                // Random position at bottom of screen
+                const x = Math.random() * window.innerWidth;
+                const y = window.innerHeight - 50;
+
+                diya.style.left = `${x}px`;
+                diya.style.top = `${y}px`;
+
+                // Random size and animation delay
+                const size = Math.random() * 30 + 20;
+                diya.style.width = `${size}px`;
+                diya.style.height = `${size}px`;
+                diya.style.animationDelay = `${Math.random() * 2}s`;
+
+                container.appendChild(diya);
+            }
+        }
+
+        // Cracker Burst Effect Functions
+        function createBurst() {
+            // Random position on screen
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * window.innerHeight;
+
+            // Create burst center
+            const burst = document.createElement('div');
+            burst.className = 'burst';
+            burst.style.left = `${x}px`;
+            burst.style.top = `${y}px`;
+            burst.style.backgroundColor = burstColors[Math.floor(Math.random() * burstColors.length)];
+            document.body.appendChild(burst);
+
+            // Flash animation
+            flash.style.opacity = 0.8;
+            setTimeout(() => {
+                flash.style.opacity = 0;
+            }, 50);
+
+            // Burst animation
+            let scale = 1;
+            const burstInterval = setInterval(() => {
+                scale += 0.2;
+                burst.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                burst.style.opacity = 1 - (scale / 10);
+
+                if (scale > 10) {
+                    clearInterval(burstInterval);
+                    burst.remove();
+                }
+            }, 30);
+
+            // Create particles
+            createParticles(x, y, burst.style.backgroundColor);
+        }
+
+        function createParticles(x, y, color) {
+            const particleCount = 60;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = `${x}px`;
+                particle.style.top = `${y}px`;
+                particle.style.backgroundColor = color || burstColors[Math.floor(Math.random() * burstColors.length)];
+
+                // Randomize particle appearance
+                const size = Math.random() * 5 + 2;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+
+                document.body.appendChild(particle);
+
+                // Random direction and speed
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 5 + 2;
+                const vx = Math.cos(angle) * speed;
+                const vy = Math.sin(angle) * speed;
+
+                let opacity = 1;
+                let currentX = x;
+                let currentY = y;
+
+                // Animate particle
+                const particleInterval = setInterval(() => {
+                    currentX += vx;
+                    currentY += vy;
+                    opacity -= 0.02;
+
+                    particle.style.left = `${currentX}px`;
+                    particle.style.top = `${currentY}px`;
+                    particle.style.opacity = opacity;
+
+                    if (opacity <= 0) {
+                        clearInterval(particleInterval);
+                        particle.remove();
+                    }
+                }, 30);
+            }
+        }
+
+        function startBurstEffect() {
+            // Start with 2 bursts
+            createBurst();
+            createBurst();
+
+            // Continue with random bursts
+            const burstInterval = setInterval(() => {
+                createBurst();
+            }, Math.random() * 1000 + 500);
+
+            // Stop after 10 seconds
+            setTimeout(() => {
+                clearInterval(burstInterval);
+            }, 10000);
+        }
+    </script>
+</body>
+
+</html>
